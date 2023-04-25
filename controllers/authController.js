@@ -1,6 +1,9 @@
+const User = require("../models/User");
+const { StatusCode } = require("http-status-codes");
 // REGISTER
-function register(req, res) {
-  res.send("REGISTER");
+async function register(req, res) {
+  const user = await User.create(req.body);
+  res.status(StatusCode.CREATED).json({ user });
 }
 
 // LOGIN
