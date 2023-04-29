@@ -3,6 +3,7 @@ require("express-async-errors");
 const app = express();
 const dotenv = require("dotenv");
 const mongoConnect = require("./db/connect");
+const morgan = require("morgan");
 
 //Routes
 const authRoute = require("./routes/authRoutes");
@@ -13,6 +14,10 @@ dotenv.config();
 //middleware
 const notFoundMiddleware = require("./middleware/notFound");
 const errorHandlerMiddleware = require("./middleware/errorHandler");
+
+if (process.env.NODE_ENV !== "production") {
+  app.use(morgan("dev"));
+}
 
 app.use(express.json());
 
