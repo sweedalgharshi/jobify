@@ -1,15 +1,25 @@
 import { Outlet, Link } from "react-router-dom";
 import Wrapper from "../../assets/wrappers/SharedLayout";
+import { Navbar, SmallSidebar, BigSidebar } from "../../components";
+import { useAppContext } from "../../context/appContext";
 
 function SharedLayout() {
+  const { user } = useAppContext();
   return (
-    <Wrapper>
-      <nav>
-        <Link to="add-job">Add Job</Link>
-        <Link to="all-jobs">All Jobs</Link>
-      </nav>
-      <Outlet />
-    </Wrapper>
+    <>
+      <Wrapper>
+        <main className="dashboard">
+          <SmallSidebar />
+          <BigSidebar />
+          <div>
+            <Navbar />
+            <div className="dashboard-page">
+              <Outlet />
+            </div>
+          </div>
+        </main>
+      </Wrapper>
+    </>
   );
 }
 export default SharedLayout;
