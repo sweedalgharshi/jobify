@@ -7,15 +7,18 @@ import {
   LOGIN_USER_BEGIN,
   LOGIN_USER_SUCCESS,
   LOGIN_USER_ERROR,
-} from "./actions";
+  TOGGLE_SIDEBAR,
+  LOGOUT_USER,
+} from './actions';
+import { initialState } from './appContext';
 
 const reducer = (state, action) => {
   if (action.type === DISPLAY_ALERT) {
     return {
       ...state,
       showAlert: true,
-      alertType: "danger",
-      alertText: "Please provide all values!",
+      alertType: 'danger',
+      alertText: 'Please provide all values!',
     };
   }
 
@@ -23,8 +26,8 @@ const reducer = (state, action) => {
     return {
       ...state,
       showAlert: false,
-      alertType: "",
-      alertText: "",
+      alertType: '',
+      alertText: '',
     };
   }
 
@@ -44,8 +47,8 @@ const reducer = (state, action) => {
       userLocation: action.payload.location,
       jobLocation: action.payload.location,
       showAlert: true,
-      alertType: "success",
-      alertText: "User created! Redirecting...",
+      alertType: 'success',
+      alertText: 'User created! Redirecting...',
     };
   }
 
@@ -54,7 +57,7 @@ const reducer = (state, action) => {
       ...state,
       isLoading: false,
       showAlert: true,
-      alertType: "danger",
+      alertType: 'danger',
       alertText: action.payload.msg,
     };
   }
@@ -75,8 +78,8 @@ const reducer = (state, action) => {
       userLocation: action.payload.location,
       jobLocation: action.payload.location,
       showAlert: true,
-      alertType: "success",
-      alertText: "Login successful! Redirecting...",
+      alertType: 'success',
+      alertText: 'Login successful! Redirecting...',
     };
   }
 
@@ -85,8 +88,25 @@ const reducer = (state, action) => {
       ...state,
       isLoading: false,
       showAlert: true,
-      alertType: "danger",
+      alertType: 'danger',
       alertText: action.payload.msg,
+    };
+  }
+
+  if (action.type === TOGGLE_SIDEBAR) {
+    return {
+      ...state,
+      showSidebar: !state.showSidebar,
+    };
+  }
+
+  if (action.type === LOGOUT_USER) {
+    return {
+      ...initialState,
+      user: null,
+      token: null,
+      jobLocation: '',
+      userLocation: '',
     };
   }
   throw new Error(`no such action :${action.type}`);
