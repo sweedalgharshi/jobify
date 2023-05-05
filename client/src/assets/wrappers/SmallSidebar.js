@@ -14,10 +14,12 @@ const Wrapper = styled.aside`
     z-index: -1;
     opacity: 0;
     transition: var(--transition);
+    visibility: hidden;
   }
   .show-sidebar {
     z-index: 99;
     opacity: 1;
+    visibility: visible;
   }
   .content {
     background: var(--white);
