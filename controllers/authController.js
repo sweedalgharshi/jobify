@@ -1,19 +1,22 @@
-const User = require("../models/User");
-const { StatusCodes } = require("http-status-codes");
-const { BadRequestError, UnAuthenticatedError } = require("../errors/index");
+const User = require('../models/User');
+const { StatusCodes } = require('http-status-codes');
+const {
+  BadRequestError,
+  UnAuthenticatedError,
+} = require('../errors/index');
 
 // REGISTER
 async function register(req, res) {
   const { name, email, password } = req.body;
 
   if (!name || !email || !password) {
-    throw new BadRequestError("Please provide all values");
+    throw new BadRequestError('Please provide all values');
   }
 
   const userAlreadyExist = await User.findOne({ email });
 
   if (userAlreadyExist) {
-    throw new BadRequestError("Email already in use");
+    throw new BadRequestError('Email already in use');
   }
   const user = await User.create({ name, email, password });
 
@@ -37,13 +40,13 @@ async function login(req, res) {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    throw new BadRequestError("Please provide all values");
+    throw new BadRequestError('Please provide all values');
   }
 
-  const user = await User.findOne({ email }).select("+password");
+  const user = await User.findOne({ email }).select('+password');
 
   if (!user) {
-    throw new UnAuthenticatedError("Invalid Credentials");
+    throw new UnAuthenticatedError('Invalid Credentials');
   }
 
   console.log(user);
@@ -51,19 +54,22 @@ async function login(req, res) {
   const isPasswordCorrect = await user.comparePassword(password);
 
   if (!isPasswordCorrect) {
-    throw new UnAuthenticatedError("Invalid Credentials");
+    throw new UnAuthenticatedError('Invalid Credentials');
   }
 
   const token = user.createJWT();
   user.password = undefined;
 
-  res.status(StatusCodes.OK).json({ user, token, location: user.location });
+  res
+    .status(StatusCodes.OK)
+    .json({ user, token, location: user.location });
 }
 
 // UPDATE
 
 function updateUser(req, res) {
-  res.send("UPDATE USER");
+  console.log(req.user);
+  res.send('Updated User');
 }
 
 module.exports = {
