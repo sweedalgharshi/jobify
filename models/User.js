@@ -1,12 +1,12 @@
-const mongoose = require("mongoose");
-const validator = require("validator");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+const mongoose = require('mongoose');
+const validator = require('validator');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const UserSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, "Please provide name"],
+    required: [true, 'Please provide name'],
     minlength: 3,
     maxlength: 20,
     trim: true,
@@ -14,17 +14,17 @@ const UserSchema = new mongoose.Schema({
 
   email: {
     type: String,
-    required: [true, "Please provide email"],
+    required: [true, 'Please provide email'],
     validate: {
       validator: validator.isEmail,
-      message: "Please provide a valid email",
+      message: 'Please provide a valid email',
     },
     unique: true,
   },
 
   password: {
     type: String,
-    required: [true, "Please provide password"],
+    required: [true, 'Please provide password'],
     minlength: 6,
     select: false,
   },
@@ -33,18 +33,21 @@ const UserSchema = new mongoose.Schema({
     type: String,
     trim: true,
     maxlength: 20,
-    default: "lastName",
+    default: 'lastName',
   },
 
   location: {
     type: String,
     trim: true,
     maxlength: 20,
-    default: "Mumbai IN",
+    default: 'Mumbai IN',
   },
 });
 
-UserSchema.pre("save", async function () {
+UserSchema.pre('save', async function () {
+  // console.log(this.modifiedPaths());
+
+  if (!this.isModified('password')) return;
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
@@ -55,9 +58,14 @@ UserSchema.methods.createJWT = function () {
   });
 };
 
-UserSchema.methods.comparePassword = async function (candidatePassword) {
-  const isMatch = await bcrypt.compare(candidatePassword, this.password);
+UserSchema.methods.comparePassword = async function (
+  candidatePassword
+) {
+  const isMatch = await bcrypt.compare(
+    candidatePassword,
+    this.password
+  );
   return isMatch;
 };
 
-module.exports = mongoose.model("User", UserSchema);
+module.exports = mongoose.model('User', UserSchema);
