@@ -23,8 +23,12 @@ function deleteJob(req, res) {
 }
 
 // get all jobs
-function getAllJobs(req, res) {
-  res.send('GET ALL JOBS');
+async function getAllJobs(req, res) {
+  const jobs = await Job.find({ createdBy: req.user.userId });
+
+  res
+    .status(StatusCodes.OK)
+    .json({ jobs, totalJobs: jobs.length, numOfPages: 1 });
 }
 
 // update job
