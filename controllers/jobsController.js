@@ -3,6 +3,8 @@ const { StatusCodes } = require('http-status-codes');
 const { BadRequestError, NotFoundError } = require('../errors/index');
 const checkPermissions = require('../utils/checkPermissions');
 
+const mongoose = require('mongoose');
+
 // Create job
 async function createJob(req, res) {
   const { position, company } = req.body;
@@ -77,8 +79,34 @@ async function updateJob(req, res) {
 }
 
 // show stats
-function showStats(req, res) {
-  res.send('SHOW STATS');
+async function showStats(req, res) {
+  let stats = await Job.aggregate([
+    {
+      $match: {
+        createdBy: new mongoose.Types.ObjectId(req.user.userId),
+      },
+    },
+    {
+      $group: { _id: '$status', count: { $sum: 1 } },
+    },
+  ]);
+
+  stats = stats.reduce((acc, current) => {
+    const { _id: title, count } = current;
+    acc[title] = count;
+    return acc;
+  }, {});
+
+  const defaultStats = {
+    pending: stats.pending || 0,
+    interview: stats.interview || 0,
+    declined: stats.declined || 0,
+  };
+
+  let monthlyApplications = [];
+  res
+    .status(StatusCodes.OK)
+    .json({ defaultStats, monthlyApplications });
 }
 
 module.exports = {
