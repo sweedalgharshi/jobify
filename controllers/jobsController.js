@@ -40,7 +40,46 @@ async function deleteJob(req, res) {
 
 // get all jobs
 async function getAllJobs(req, res) {
-  const jobs = await Job.find({ createdBy: req.user.userId });
+  const { status, jobType, sort, search } = req.query;
+
+  const queryObject = {
+    createdBy: req.user.userId,
+  };
+
+  // ADD STUFF BASED ON CONDITIONS
+  if (status !== 'all') {
+    queryObject.status = status;
+  }
+
+  if (jobType !== 'all') {
+    queryObject.jobType = jobType;
+  }
+
+  if (search) {
+    queryObject.position = { $regex: search, $options: 'i' };
+  }
+
+  // NO AWAIT
+  let results = Job.find(queryObject);
+
+  // chain sort condition
+  if (sort === 'latest') {
+    results = results.sort('-createdAt');
+  }
+
+  if (sort === 'oldest') {
+    results = results.sort('createdAt');
+  }
+
+  if (sort === 'a-z') {
+    results = results.sort('position');
+  }
+
+  if (sort === 'z-a') {
+    results = results.sort('-position');
+  }
+
+  const jobs = await results;
 
   res
     .status(StatusCodes.OK)
