@@ -295,7 +295,6 @@ const AppProvider = ({ children }) => {
         },
       });
     } catch (error) {
-      console.log(error.response);
       logoutUser();
     }
     clearAlert();
@@ -367,9 +366,7 @@ const AppProvider = ({ children }) => {
           monthlyApplications: data.monthlyApplications,
         },
       });
-    } catch (error) {
-      console.log(error.response);
-    }
+    } catch (error) {}
     clearAlert();
   };
 

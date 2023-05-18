@@ -49,8 +49,6 @@ async function login(req, res) {
     throw new UnAuthenticatedError('Invalid Credentials');
   }
 
-  console.log(user);
-
   const isPasswordCorrect = await user.comparePassword(password);
 
   if (!isPasswordCorrect) {

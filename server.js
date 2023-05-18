@@ -4,6 +4,7 @@ const app = express();
 const dotenv = require('dotenv');
 const mongoConnect = require('./db/connect');
 const morgan = require('morgan');
+const path = require('path');
 
 //Routes
 const authRoute = require('./routes/authRoutes');
@@ -20,14 +21,17 @@ if (process.env.NODE_ENV !== 'production') {
   app.use(morgan('dev'));
 }
 
+app.use(express.static(path.resolve(__dirname, './client/build')));
 app.use(express.json());
-
-app.get('/', (req, res) => {
-  res.send('Welcome!!!');
-});
 
 app.use('/api/v1/auth', authRoute);
 app.use('/api/v1/jobs', authenticateUser, jobRoute);
+
+app.get('*', function (req, res) {
+  res.sendFile(
+    path.resolve(__dirname, './client/build', 'index.html')
+  );
+});
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
