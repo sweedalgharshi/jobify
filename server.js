@@ -5,6 +5,9 @@ const dotenv = require('dotenv');
 const mongoConnect = require('./db/connect');
 const morgan = require('morgan');
 const path = require('path');
+const helmet = require('helmet');
+const xss = require('xss-clean');
+const mongoSanitize = require('express-mongo-sanitize');
 
 //Routes
 const authRoute = require('./routes/authRoutes');
@@ -23,6 +26,9 @@ if (process.env.NODE_ENV !== 'production') {
 
 app.use(express.static(path.resolve(__dirname, './client/build')));
 app.use(express.json());
+app.use(helmet());
+app.use(xss());
+app.use(mongoSanitize());
 
 app.use('/api/v1/auth', authRoute);
 app.use('/api/v1/jobs', authenticateUser, jobRoute);
