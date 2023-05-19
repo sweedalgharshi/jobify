@@ -56,6 +56,11 @@ function Register() {
       }, 3000);
     }
   }, [user, navigate]);
+
+  const testUser = {
+    email: 'testUser@test.com',
+    password: 'secret',
+  };
   return (
     <Wrapper className="full-page">
       <form className="form" onSubmit={onSubmit}>
@@ -98,6 +103,15 @@ function Register() {
           disabled={isLoading}
         >
           Submit
+        </button>
+
+        <button
+          type="button"
+          className="btn btn-block btn-hipster"
+          disabled={isLoading}
+          onClick={() => loginUser(testUser)}
+        >
+          demo app
         </button>
 
         <p>

@@ -8,7 +8,7 @@ const Job = require('./models/Job');
 const start = async () => {
   try {
     await mongoConnect();
-    await Job.deleteMany();
+    // await Job.deleteMany();
 
     const jsonProducts = JSON.parse(
       await readFileSync('./mock-data.json', 'utf-8')

@@ -1,5 +1,6 @@
 const express = require('express');
 const rateLimiter = require('express-rate-limit');
+const testUser = require('../middleware/testUser');
 
 const apiLimiter = rateLimiter({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -20,6 +21,8 @@ const authenticateUser = require('../middleware/auth');
 
 router.route('/register').post(apiLimiter, register);
 router.route('/login').post(apiLimiter, login);
-router.route('/updateUser').patch(authenticateUser, updateUser);
+router
+  .route('/updateUser')
+  .patch(authenticateUser, testUser, updateUser);
 
 module.exports = router;
