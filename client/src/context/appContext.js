@@ -1,4 +1,9 @@
-import React, { createContext, useContext, useReducer } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useReducer,
+} from 'react';
 import reducer from './reducer';
 import {
   DISPLAY_ALERT,
@@ -31,24 +36,26 @@ import {
   CLEAR_FILTERS,
   CHANGE_PAGE,
   DELETE_JOB_ERROR,
+  GET_CURRENT_USER_BEGIN,
+  GET_CURRENT_USER_SUCCESS,
 } from './actions';
 
 import axios from 'axios';
 
-const token = localStorage.getItem('token');
-const user = localStorage.getItem('user');
-const userLocation = localStorage.getItem('location');
+// const token = localStorage.getItem('token');
+// const user = localStorage.getItem('user');
+// const userLocation = localStorage.getItem('location');
 
 export const initialState = {
+  userLoading: true,
   isLoading: false,
   showAlert: false,
   alertText: '',
   alertType: '',
-  user: user ? JSON.parse(user) : null,
-  token: token,
-  userLocation: userLocation || '',
+  user: null,
+  userLocation: '',
   showSidebar: false,
-  jobLocation: userLocation || '',
+  jobLocation: '',
   isEditing: false,
   editJobId: '',
   position: '',
@@ -82,15 +89,15 @@ const AppProvider = ({ children }) => {
 
   // interceptors
   // request
-  authFetch.interceptors.request.use(
-    (config) => {
-      config.headers['Authorization'] = `Bearer ${state.token}`;
-      return config;
-    },
-    (error) => {
-      return Promise.reject(error);
-    }
-  );
+  // authFetch.interceptors.request.use(
+  //   (config) => {
+  //     config.headers['Authorization'] = `Bearer ${state.token}`;
+  //     return config;
+  //   },
+  //   (error) => {
+  //     return Promise.reject(error);
+  //   }
+  // );
 
   // response
   authFetch.interceptors.response.use(
@@ -116,17 +123,17 @@ const AppProvider = ({ children }) => {
     }, 3000);
   };
 
-  const addUserToLocalStorage = ({ user, token, location }) => {
-    localStorage.setItem('user', JSON.stringify(user));
-    localStorage.setItem('token', token);
-    localStorage.setItem('location', location);
-  };
+  // const addUserToLocalStorage = ({ user, token, location }) => {
+  //   localStorage.setItem('user', JSON.stringify(user));
+  //   localStorage.setItem('token', token);
+  //   localStorage.setItem('location', location);
+  // };
 
-  const removeUserFromLocalStorage = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    localStorage.removeItem('location');
-  };
+  // const removeUserFromLocalStorage = () => {
+  //   localStorage.removeItem('user');
+  //   localStorage.removeItem('token');
+  //   localStorage.removeItem('location');
+  // };
 
   const registerUser = async (currentUser) => {
     dispatch({ type: REGISTER_USER_BEGIN });
@@ -138,19 +145,18 @@ const AppProvider = ({ children }) => {
       );
       // console.log(response);
 
-      const { user, token, location } = response.data;
+      const { user, location } = response.data;
 
       dispatch({
         type: REGISTER_USER_SUCCESS,
         payload: {
           user,
-          token,
           location,
         },
       });
 
       // local storage later
-      addUserToLocalStorage({ user, token, location });
+      // addUserToLocalStorage({ user, token, location });
     } catch (error) {
       // console.log(error.response);
       dispatch({
@@ -172,14 +178,14 @@ const AppProvider = ({ children }) => {
         '/api/v1/auth/login',
         currentUser
       );
-      const { user, token, location } = data;
+      const { user, location } = data;
 
       dispatch({
         type: LOGIN_USER_SUCCESS,
-        payload: { user, token, location },
+        payload: { user, location },
       });
 
-      addUserToLocalStorage({ user, token, location });
+      // addUserToLocalStorage({ user, token, location });
     } catch (error) {
       dispatch({
         type: LOGIN_USER_ERROR,
@@ -193,9 +199,10 @@ const AppProvider = ({ children }) => {
     dispatch({ type: TOGGLE_SIDEBAR });
   };
 
-  const logoutUser = () => {
+  const logoutUser = async () => {
+    await authFetch.get('/auth/logout');
     dispatch({ type: LOGOUT_USER });
-    removeUserFromLocalStorage();
+    // removeUserFromLocalStorage();
   };
 
   const updateUser = async (currentUser) => {
@@ -206,16 +213,14 @@ const AppProvider = ({ children }) => {
         currentUser
       );
 
-      const { user, location, token } = data;
+      const { user, location } = data;
 
       dispatch({
         type: UPDATE_USER_SUCCESS,
-        payload: { user, location, token },
+        payload: { user, location },
       });
 
-      addUserToLocalStorage({ user, location, token });
-
-      console.log(data);
+      // addUserToLocalStorage({ user, location, token });
     } catch (error) {
       // console.log(error.response);
       if (error.response.status !== 401) {
@@ -391,6 +396,31 @@ const AppProvider = ({ children }) => {
       },
     });
   };
+
+  const getCurrentUser = async () => {
+    dispatch({ type: GET_CURRENT_USER_BEGIN });
+
+    try {
+      const { data } = await authFetch('/auth/getCurrentUser');
+      const { user, location } = data;
+
+      dispatch({
+        type: GET_CURRENT_USER_SUCCESS,
+        payload: {
+          user,
+          location,
+        },
+      });
+    } catch (error) {
+      if (error.response.status === 401) return;
+      logoutUser();
+    }
+  };
+
+  useEffect(() => {
+    getCurrentUser();
+    //eslint-disable-next-line
+  }, []);
 
   return (
     <AppContext.Provider

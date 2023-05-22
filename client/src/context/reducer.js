@@ -29,6 +29,8 @@ import {
   SHOW_STATS_SUCCESS,
   CLEAR_FILTERS,
   CHANGE_PAGE,
+  GET_CURRENT_USER_BEGIN,
+  GET_CURRENT_USER_SUCCESS,
 } from './actions';
 import { initialState } from './appContext';
 
@@ -63,7 +65,6 @@ const reducer = (state, action) => {
       ...state,
       isLoading: false,
       user: action.payload.user,
-      token: action.payload.token,
       userLocation: action.payload.location,
       jobLocation: action.payload.location,
       showAlert: true,
@@ -94,7 +95,6 @@ const reducer = (state, action) => {
       ...state,
       isLoading: false,
       user: action.payload.user,
-      token: action.payload.token,
       userLocation: action.payload.location,
       jobLocation: action.payload.location,
       showAlert: true,
@@ -123,10 +123,7 @@ const reducer = (state, action) => {
   if (action.type === LOGOUT_USER) {
     return {
       ...initialState,
-      user: null,
-      token: null,
-      jobLocation: '',
-      userLocation: '',
+      userLoading: false,
     };
   }
 
@@ -141,7 +138,6 @@ const reducer = (state, action) => {
     return {
       ...state,
       isLoading: false,
-      token: action.payload.token,
       user: action.payload.user,
       userLocation: action.payload.location,
       jobLocation: action.payload.location,
@@ -325,6 +321,24 @@ const reducer = (state, action) => {
     return {
       ...state,
       page: action.payload.page,
+    };
+  }
+
+  if (action.type === GET_CURRENT_USER_BEGIN) {
+    return {
+      ...state,
+      userLoading: true,
+      showAlert: false,
+    };
+  }
+
+  if (action.type === GET_CURRENT_USER_SUCCESS) {
+    return {
+      ...state,
+      userLoading: false,
+      user: action.payload.user,
+      location: action.payload.location,
+      jobLocation: action.payload.location,
     };
   }
   throw new Error(`no such action :${action.type}`);

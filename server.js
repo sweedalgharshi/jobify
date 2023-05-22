@@ -8,6 +8,7 @@ const path = require('path');
 const helmet = require('helmet');
 const xss = require('xss-clean');
 const mongoSanitize = require('express-mongo-sanitize');
+const cookieParser = require('cookie-parser');
 
 //Routes
 const authRoute = require('./routes/authRoutes');
@@ -26,6 +27,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 app.use(express.static(path.resolve(__dirname, './client/build')));
 app.use(express.json());
+app.use(cookieParser());
 app.use(helmet());
 app.use(xss());
 app.use(mongoSanitize());

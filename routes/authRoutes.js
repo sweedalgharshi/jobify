@@ -15,14 +15,20 @@ const {
   register,
   login,
   updateUser,
+  getCurrentUser,
+  logout,
 } = require('../controllers/authController');
 
 const authenticateUser = require('../middleware/auth');
 
 router.route('/register').post(apiLimiter, register);
 router.route('/login').post(apiLimiter, login);
+router.route('/logout').get(logout);
+
 router
   .route('/updateUser')
   .patch(authenticateUser, testUser, updateUser);
+
+router.route('/getCurrentUser').get(authenticateUser, getCurrentUser);
 
 module.exports = router;
